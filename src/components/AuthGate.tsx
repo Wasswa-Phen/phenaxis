@@ -102,11 +102,11 @@ export function AuthGate({ onAuthenticated }: { onAuthenticated: () => void }) {
       <div className="card auth-card">
         <div className="auth-brand-row">
           <div className="brand" style={{ padding: 0, height: "auto" }}>
-            <div className="brand-mark">
-              <span />
-              <span />
-              <span />
-            </div>
+            <img
+              src="/Logo.png"
+              alt="PHENAXIS Logo"
+              className="brand-logo"
+            />
             <span>PHENAXIS</span>
           </div>
           <span

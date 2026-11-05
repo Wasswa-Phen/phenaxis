@@ -87,6 +87,14 @@
   letter-spacing: 0.1em;
 }
 
+.brand-logo {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
 .brand-mark {
   width: 30px;
   height: 30px;

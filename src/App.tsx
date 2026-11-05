@@ -119,11 +119,11 @@ function Sidebar({
       )}
       <aside className={`sidebar ${open ? "open" : ""}`}>
         <div className="brand">
-          <div className="brand-mark">
-            <span />
-            <span />
-            <span />
-          </div>
+          <img
+            src="/Logo.png"
+            alt="PHENAXIS Logo"
+            className="brand-logo"
+          />
           <span>PHENAXIS</span>
         </div>
         <nav>
