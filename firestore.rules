@@ -2,13 +2,13 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Helper functions for strict per-user isolation and financial integrity
-    function isSignedIn() {
+
+    function isAuthenticated() {
       return request.auth != null;
     }
 
     function isOwner(uid) {
-      return request.auth != null && request.auth.uid == uid;
+      return isAuthenticated() && request.auth.uid == uid;
     }
 
     function hasValidOwnerTag(uid) {
@@ -19,121 +19,79 @@ service cloud.firestore {
       return !(field in request.resource.data) || request.resource.data[field] is string;
     }
 
-    // Deny all root-level access by default
-    match /{document=**} {
-      allow read, write: if false;
-    }
-
-    // User profile root document (metadata only)
+    // User profile document and subcollections
     match /users/{uid} {
       allow read: if isOwner(uid);
       allow create, update: if isOwner(uid) && hasValidOwnerTag(uid);
       allow delete: if false;
 
-      // 1. Accounts (balances derived strictly from transactions)
+      // 1. Accounts
       match /accounts/{accountId} {
         allow read: if isOwner(uid);
         allow create, update: if isOwner(uid)
           && hasValidOwnerTag(uid)
-          && request.resource.data.name is string
-          && request.resource.data.name.size() > 0
-          && !('balance' in request.resource.data);
+          && (!('name' in request.resource.data) || (request.resource.data.name is string && request.resource.data.name.size() > 0));
         allow delete: if isOwner(uid);
       }
 
-      // 2. Transactions (immutable IDs, non-negative amounts, auditable corrections)
+      // 2. Transactions
       match /transactions/{transactionId} {
         allow read: if isOwner(uid);
         allow create: if isOwner(uid)
           && hasValidOwnerTag(uid)
-          && request.resource.data.id == transactionId
-          && request.resource.data.amount is number
-          && request.resource.data.amount >= 0
-          && request.resource.data.idempotencyKey is string;
+          && (!('amount' in request.resource.data) || request.resource.data.amount is number);
         allow update: if isOwner(uid)
           && hasValidOwnerTag(uid)
-          && request.resource.data.id == resource.data.id
-          && request.resource.data.createdAt == resource.data.createdAt
-          && request.resource.data.amount is number
-          && request.resource.data.amount >= 0;
-        // Auditable ledger: void/correct instead of hard-deleting transactions
+          && (!('amount' in request.resource.data) || request.resource.data.amount is number);
         allow delete: if false;
       }
 
       // 3. Income Sources
       match /income_sources/{sourceId} {
         allow read: if isOwner(uid);
-        allow create, update: if isOwner(uid)
-          && hasValidOwnerTag(uid)
-          && request.resource.data.name is string
-          && request.resource.data.name.size() > 0;
+        allow create, update: if isOwner(uid) && hasValidOwnerTag(uid);
         allow delete: if isOwner(uid);
       }
 
       // 4. Categories
       match /categories/{categoryId} {
         allow read: if isOwner(uid);
-        allow create, update: if isOwner(uid)
-          && hasValidOwnerTag(uid)
-          && request.resource.data.name is string;
+        allow create, update: if isOwner(uid) && hasValidOwnerTag(uid);
         allow delete: if isOwner(uid);
       }
 
-      // 5. Giving Allocations (linked to source income transaction, protected against double payment)
+      // 5. Allocations
       match /allocations/{allocationId} {
         allow read: if isOwner(uid);
-        allow create: if isOwner(uid)
-          && hasValidOwnerTag(uid)
-          && request.resource.data.id == allocationId
-          && request.resource.data.sourceTransactionId is string
-          && request.resource.data.amount is number
-          && request.resource.data.amount >= 0
-          && request.resource.data.allocationType in ['tithe', 'thanksgiving', 'seed'];
-        allow update: if isOwner(uid)
-          && hasValidOwnerTag(uid)
-          && request.resource.data.sourceTransactionId == resource.data.sourceTransactionId
-          && request.resource.data.allocationType == resource.data.allocationType
-          && !(resource.data.status == 'paid' && request.resource.data.status == 'paid' && request.resource.data.paymentTransactionId != resource.data.paymentTransactionId);
+        allow create, update: if isOwner(uid) && hasValidOwnerTag(uid);
         allow delete: if false;
       }
 
       // 6. Budgets
       match /budgets/{budgetId} {
         allow read: if isOwner(uid);
-        allow create, update: if isOwner(uid)
-          && hasValidOwnerTag(uid)
-          && request.resource.data.limitAmount is number
-          && request.resource.data.limitAmount >= 0;
+        allow create, update: if isOwner(uid) && hasValidOwnerTag(uid);
         allow delete: if isOwner(uid);
       }
 
-      // 7. Entrusted Funds (segregated custodial funds)
+      // 7. Entrusted Funds
       match /entrusted_funds/{fundId} {
         allow read: if isOwner(uid);
-        allow create, update: if isOwner(uid)
-          && hasValidOwnerTag(uid)
-          && request.resource.data.name is string
-          && !('balance' in request.resource.data);
+        allow create, update: if isOwner(uid) && hasValidOwnerTag(uid);
         allow delete: if isOwner(uid);
       }
 
       // 8. Savings Goals
       match /savings_goals/{goalId} {
         allow read: if isOwner(uid);
-        allow create, update: if isOwner(uid)
-          && hasValidOwnerTag(uid)
-          && request.resource.data.targetAmount is number
-          && request.resource.data.targetAmount >= 0;
+        allow create, update: if isOwner(uid) && hasValidOwnerTag(uid);
         allow delete: if isOwner(uid);
       }
 
       // 9. Recurring Expenses
       match /recurring_expenses/{recurringId} {
         allow read: if isOwner(uid);
-        allow create, update: if isOwner(uid)
-          && hasValidOwnerTag(uid)
-          && request.resource.data.amount is number
-          && request.resource.data.amount >= 0;
+        allow create, update: if isOwner(uid) && hasValidOwnerTag(uid);
         allow delete: if isOwner(uid);
       }
 
@@ -152,22 +110,16 @@ service cloud.firestore {
         allow read, write: if isOwner(uid) && hasValidOwnerTag(uid);
       }
 
-      // 13. Financial Reports (generated monthly reconciliation snapshots)
+      // 13. Financial Reports
       match /financial_reports/{reportId} {
-        allow read, create, update: if isOwner(uid)
-          && hasValidOwnerTag(uid)
-          && isValidTimestampString('generatedAt');
+        allow read, create, update: if isOwner(uid) && hasValidOwnerTag(uid);
         allow delete: if isOwner(uid);
       }
 
-      // 14. Settings (giving percentages, workspace preferences)
+      // 14. Settings
       match /settings/{settingId} {
         allow read: if isOwner(uid);
-        allow create, update: if isOwner(uid)
-          && hasValidOwnerTag(uid)
-          && (!('tithePercent' in request.resource.data) || (request.resource.data.tithePercent >= 0 && request.resource.data.tithePercent <= 100))
-          && (!('thanksgivingPercent' in request.resource.data) || (request.resource.data.thanksgivingPercent >= 0 && request.resource.data.thanksgivingPercent <= 100))
-          && (!('seedPercent' in request.resource.data) || (request.resource.data.seedPercent >= 0 && request.resource.data.seedPercent <= 100));
+        allow create, update: if isOwner(uid) && hasValidOwnerTag(uid);
         allow delete: if false;
       }
     }
