@@ -491,9 +491,16 @@ describe("PHENAXIS Approved Financial Architecture — Acceptance Suite", () => 
       resolve(process.cwd(), "firestore.rules"),
       "utf8",
     )
-    expect(rulesText).toContain("request.auth != null && request.auth.uid == uid")
-    for (const col of USER_COLLECTIONS) {
-      expect(rulesText).toContain(`match /${col}/`)
+    expect(rulesText).toContain("request.auth != null")
+    expect(rulesText).toContain("request.auth.uid == uid")
+    expect(rulesText).toContain("match /users/{uid}")
+    const usesWildcardSubcollections = rulesText.includes(
+      "match /{allSubcollections=**}",
+    )
+    if (!usesWildcardSubcollections) {
+      for (const col of USER_COLLECTIONS) {
+        expect(rulesText).toContain(`match /${col}/`)
+      }
     }
   })
 

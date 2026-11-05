@@ -543,7 +543,7 @@ export function QuickAddModal({
               {isEligible ? (
                 <div className="allocation-preview">
                   <div className="allocation-preview-head">
-                    <Icon name="church" size={14} />
+                    <Icon name="church" size={16} />
                     <strong>
                       Automatic Giving Allocation Engine (
                       {snapshot.settings.tithePercent +
@@ -582,7 +582,7 @@ export function QuickAddModal({
                 </div>
               ) : (
                 <div className="notice">
-                  <Icon name="shield" size={15} />
+                  <Icon name="shield" size={16} />
                   <span>
                     {incType === "business_gross_revenue"
                       ? "Business gross revenue is NOT classified as personal income. Record Project Costs against it, and use Business Owner Withdrawal when drawing personal pay."
@@ -717,7 +717,7 @@ export function QuickAddModal({
           {tab === "Transfer" && (
             <>
               <div className="notice">
-                <Icon name="swap" size={15} />
+                <Icon name="swap" size={16} />
                 <span>
                   Atomic linked transfer moves money between your accounts with{" "}
                   <strong>zero new income</strong> and{" "}
@@ -788,7 +788,7 @@ export function QuickAddModal({
           {tab === "Entrusted" && (
             <>
               <div className="notice">
-                <Icon name="shield" size={15} />
+                <Icon name="shield" size={16} />
                 <span>
                   Entrusted funds are strictly separated from your personal
                   balance and create zero personal giving allocations.
@@ -1138,7 +1138,7 @@ export function PayAllocationModal({
 
         <div className="allocation-preview" style={{ margin: "16px 0" }}>
           <div className="allocation-preview-head">
-            <Icon name="church" size={14} />
+            <Icon name="church" size={16} />
             <strong>
               {allocation.label} ({allocation.percentage}%) ·{" "}
               {allocation.sourceTransactionTitle}
@@ -1328,7 +1328,7 @@ export function TransactionAuditModal({
         {linkedAllocs.length > 0 && (
           <div className="allocation-preview" style={{ marginBottom: 12 }}>
             <div className="allocation-preview-head">
-              <Icon name="church" size={14} />
+              <Icon name="church" size={16} />
               <strong>Linked Giving Allocations ({linkedAllocs.length})</strong>
             </div>
             <div className="allocation-preview-grid">
@@ -1403,7 +1403,7 @@ export function TransactionAuditModal({
                 Void record
               </button>
               <button type="submit" className="quick-add" disabled={busy}>
-                <Icon name="edit" size={15} />
+                <Icon name="edit" size={16} />
                 <span>Save auditable correction</span>
               </button>
             </div>

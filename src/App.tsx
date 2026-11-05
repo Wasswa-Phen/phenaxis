@@ -174,11 +174,11 @@ function Sidebar({
             <button
               type="button"
               className="icon-button"
-              style={{ width: 24, height: 24 }}
+              style={{ width: 34, height: 34 }}
               title="Sign out / Switch user"
               onClick={onSignOut}
             >
-              <Icon name="logout" size={14} />
+              <Icon name="logout" size={16} />
             </button>
           </div>
         </div>

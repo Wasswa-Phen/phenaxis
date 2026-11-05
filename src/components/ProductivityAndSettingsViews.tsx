@@ -119,7 +119,7 @@ export function ProductivityPage({
               onChange={(e) => setProjAmount(e.target.value)}
             />
             <button type="submit" className="quick-add">
-              <Icon name="plus" size={14} /> Add Project
+              <Icon name="plus" size={16} /> Add Project
             </button>
           </form>
         </div>
@@ -198,7 +198,7 @@ export function ProductivityPage({
                 onOpenQuickAdd(page === "Tasks" ? "Task" : "Event")
               }
             >
-              <Icon name="plus" size={14} />{" "}
+              <Icon name="plus" size={16} />{" "}
               {page === "Tasks" ? "Add task" : "Add block"}
             </button>
           </div>
@@ -221,13 +221,13 @@ export function ProductivityPage({
                       aria-label="Toggle task"
                     >
                       <span>
-                        {task.done && <Icon name="check" size={13} />}
+                        {task.done && <Icon name="check" size={14} />}
                       </span>
                     </button>
                     <div>
                       <strong>{task.title}</strong>
                       <small>
-                        <Icon name="clock" size={12} />
+                        <Icon name="clock" size={13} />
                         {task.meta} · Due {task.dueDate}
                       </small>
                     </div>
@@ -237,7 +237,7 @@ export function ProductivityPage({
                       onClick={() => deleteTask(task.id)}
                       aria-label="Delete task"
                     >
-                      <Icon name="close" size={13} />
+                      <Icon name="close" size={15} />
                     </button>
                   </div>
                 ))
@@ -256,7 +256,7 @@ export function ProductivityPage({
                     <div className={b.color}>
                       <strong>{b.title}</strong>
                       <small>
-                        <Icon name="clock" size={12} />
+                        <Icon name="clock" size={13} />
                         {b.durationLabel} · {b.scope} ({b.date})
                       </small>
                     </div>
@@ -265,7 +265,7 @@ export function ProductivityPage({
                       onClick={() => deleteEvent(b.id)}
                       aria-label="Remove event"
                     >
-                      <Icon name="close" size={14} />
+                      <Icon name="close" size={15} />
                     </button>
                   </div>
                 ))
@@ -321,7 +321,7 @@ export function ProductivityPage({
                       {t.priority} · {t.meta}
                     </small>
                   </span>
-                  <Icon name="chevron" size={14} />
+                  <Icon name="chevron" size={15} />
                 </div>
               ))}
             {snapshot.tasks.filter((t) => !t.done).length === 0 && (
@@ -468,7 +468,7 @@ export function SettingsPage({
 
             <div className="allocation-preview">
               <div className="allocation-preview-head">
-                <Icon name="church" size={14} />
+                <Icon name="church" size={16} />
                 <strong>
                   Sample Calculation on UGX 500,000 Eligible Income ({totalPct}%
                   Total)
@@ -559,7 +559,7 @@ export function SettingsPage({
               className="outline-btn danger-outline"
               onClick={onSignOut}
             >
-              <Icon name="logout" size={14} /> Sign out / Switch user
+              <Icon name="logout" size={16} /> Sign out / Switch user
             </button>
           </div>
         </div>

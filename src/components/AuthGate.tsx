@@ -112,7 +112,7 @@ export function AuthGate({ onAuthenticated }: { onAuthenticated: () => void }) {
           <span
             className={`phx-badge ${runtime.mode === "firebase_cloud" ? "green" : "indigo"}`}
           >
-            <Icon name="lock" size={11} />
+            <Icon name="lock" size={13} />
             {runtime.mode === "firebase_cloud"
               ? `Cloud Firestore · ${runtime.projectId}`
               : "Isolated User Vault"}
@@ -295,7 +295,7 @@ export function AuthGate({ onAuthenticated }: { onAuthenticated: () => void }) {
               className="quick-add auth-submit"
               disabled={busy}
             >
-              <Icon name="lock" size={15} />
+              <Icon name="lock" size={16} />
               <span>
                 {busy
                   ? "Authenticating..."

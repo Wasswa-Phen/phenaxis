@@ -288,7 +288,7 @@ export function FinanceCommandPage({
             className="outline-btn"
             onClick={() => onOpenQuickAdd("Income")}
           >
-            <Icon name="plus" size={14} /> Record Income
+            <Icon name="plus" size={16} /> Record Income
           </button>
         </div>
       </div>
@@ -358,7 +358,7 @@ export function FinanceCommandPage({
                   placeholder="Ask your AI Accountant about your real figures..."
                 />
                 <button type="submit" aria-label="Ask AI Accountant">
-                  <Icon name="send" size={14} />
+                  <Icon name="send" size={16} />
                 </button>
               </form>
             </div>
@@ -533,7 +533,7 @@ export function FinanceCommandPage({
                 onChange={(e) => setNewSrcDesc(e.target.value)}
               />
               <button type="submit" className="quick-add">
-                <Icon name="plus" size={14} /> Add Source
+                <Icon name="plus" size={16} /> Add Source
               </button>
             </form>
           </div>
@@ -763,7 +763,7 @@ export function FinanceCommandPage({
                 onChange={(e) => setGoalDate(e.target.value)}
               />
               <button type="submit" className="quick-add">
-                <Icon name="plus" size={14} /> Add Goal
+                <Icon name="plus" size={16} /> Add Goal
               </button>
             </form>
 
@@ -902,7 +902,7 @@ export function FinanceCommandPage({
                   onChange={(e) => setRecDay(e.target.value)}
                 />
                 <button type="submit" className="quick-add">
-                  <Icon name="plus" size={14} /> Add Recurring
+                  <Icon name="plus" size={16} /> Add Recurring
                 </button>
               </div>
             </form>
@@ -922,7 +922,8 @@ export function FinanceCommandPage({
                     <div className="transaction-name">
                       <strong>{rec.name}</strong>
                       <span>
-                        Due day {rec.dueDayOfMonth} · {rec.categoryName}
+                        Due day {rec.dueDayOfMonth} · {rec.categoryName} ·{" "}
+                        {ugxAbs(rec.amount)}
                       </span>
                     </div>
                     <span className="transaction-date">
@@ -1062,7 +1063,7 @@ export function TransactionsPage({
             className="outline-btn"
             onClick={exportLedgerCsv}
           >
-            <Icon name="download" size={15} /> Export CSV
+            <Icon name="download" size={16} /> Export CSV
           </button>
         </div>
       </div>
@@ -1233,7 +1234,7 @@ export function AccountsPage({
             onChange={(e) => setInstitution(e.target.value)}
           />
           <button type="submit" className="quick-add">
-            <Icon name="plus" size={14} /> Add Account
+            <Icon name="plus" size={16} /> Add Account
           </button>
         </form>
       </div>
@@ -1323,7 +1324,7 @@ export function EntrustedFundsPage({
             className="quick-add"
             onClick={() => onOpenQuickAdd("Entrusted")}
           >
-            <Icon name="plus" size={14} /> New entrusted fund
+            <Icon name="plus" size={16} /> New entrusted fund
           </button>
         </div>
       ) : (
@@ -1368,7 +1369,7 @@ export function EntrustedFundsPage({
                   onClick={() => onOpenQuickAdd("Entrusted")}
                 >
                   Record receipt / disbursement{" "}
-                  <Icon name="chevron" size={14} />
+                  <Icon name="chevron" size={15} />
                 </button>
               </div>
             )
@@ -1672,7 +1673,7 @@ export function ReportsPage({
           <span
             className={`phx-badge ${recon.isReconciled ? "green" : "amber"}`}
           >
-            <Icon name="circleCheck" size={13} />
+            <Icon name="circleCheck" size={14} />
             {recon.isReconciled
               ? `Ledger Reconciled · 0 UGX Variance (${monthKey})`
               : `Check Variance: ${ugx(recon.variance)}`}
@@ -1697,7 +1698,7 @@ export function ReportsPage({
             className="outline-btn"
             onClick={exportMonthlyReportCsv}
           >
-            <Icon name="download" size={15} /> Export CSV
+            <Icon name="download" size={16} /> Export CSV
           </button>
         </div>
       </div>

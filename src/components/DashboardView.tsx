@@ -295,7 +295,7 @@ export function StatCard({
       <strong className="stat-amount">{amount}</strong>
       <div className={`stat-change ${inverse ? "negative" : ""}`}>
         <span>
-          <Icon name="arrowUp" size={12} />
+          <Icon name="arrowUp" size={13} />
           {change}
         </span>
         {changeLabel}
@@ -542,7 +542,7 @@ export function DashboardView({
                 <option>3 months</option>
                 <option>12 months</option>
               </select>
-              <Icon name="arrowDown" size={13} />
+              <Icon name="arrowDown" size={15} />
             </div>
           </div>
           <div className="legend">
@@ -634,7 +634,7 @@ export function DashboardView({
               className="text-button"
               onClick={() => setActive("Transactions")}
             >
-              View all <Icon name="chevron" size={14} />
+              View all <Icon name="chevron" size={15} />
             </button>
           </div>
           <div className="filter-tabs">
@@ -659,7 +659,7 @@ export function DashboardView({
                     className="quick-add"
                     onClick={() => onOpenQuickAdd("Income")}
                   >
-                    <Icon name="plus" size={14} /> Record income
+                    <Icon name="plus" size={16} /> Record income
                   </button>
                   <button
                     type="button"
@@ -697,7 +697,7 @@ export function DashboardView({
                 className="text-button"
                 onClick={() => setActive("Tasks")}
               >
-                View all <Icon name="chevron" size={14} />
+                View all <Icon name="chevron" size={15} />
               </button>
             </div>
             <div className="task-progress">
@@ -732,13 +732,13 @@ export function DashboardView({
                       }`}
                     >
                       <span>
-                        {task.done && <Icon name="check" size={13} />}
+                        {task.done && <Icon name="check" size={14} />}
                       </span>
                     </button>
                     <div>
                       <strong>{task.title}</strong>
                       <small>
-                        <Icon name="clock" size={12} />
+                        <Icon name="clock" size={13} />
                         {task.meta}
                       </small>
                     </div>
@@ -760,7 +760,7 @@ export function DashboardView({
                 className="text-button"
                 onClick={() => setActive("Calendar")}
               >
-                Calendar <Icon name="chevron" size={14} />
+                Calendar <Icon name="chevron" size={15} />
               </button>
             </div>
             {snapshot.calendarEvents.length === 0 ? (
@@ -778,7 +778,7 @@ export function DashboardView({
                   <div>
                     <strong>{ev.title}</strong>
                     <span>
-                      <Icon name="clock" size={12} /> {ev.durationLabel} ·{" "}
+                      <Icon name="clock" size={13} /> {ev.durationLabel} ·{" "}
                       {ev.scope}
                     </span>
                   </div>
