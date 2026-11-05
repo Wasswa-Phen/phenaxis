@@ -3,9 +3,11 @@ import { defaultAuthService } from "../services/authService"
 import {
   clearUiFirebaseConfig,
   getFirebaseRuntime,
+  isLocalVaultForced,
   readSavedUiFirebaseConfig,
   resetFirebaseRuntimeCache,
   saveUiFirebaseConfig,
+  setLocalVaultForced,
 } from "../services/firebaseClient"
 import { Icon } from "./Icons"
 
@@ -42,7 +44,17 @@ export function AuthGate({ onAuthenticated }: { onAuthenticated: () => void }) {
       }
       onAuthenticated()
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Authentication failed.")
+      const msg = err instanceof Error ? err.message : "Authentication failed."
+      if (
+        msg.includes("auth/configuration-not-found") ||
+        msg.includes("auth/operation-not-allowed")
+      ) {
+        setError(
+          `One-time Firebase Console step needed: enable "Email/Password" sign-in at console.firebase.google.com/project/${runtime.projectId || "phenaxis-ug"}/authentication/providers — or tap "Use Instant Device Vault" below to test immediately.`,
+        )
+      } else {
+        setError(msg)
+      }
     } finally {
       setBusy(false)
     }
@@ -148,7 +160,41 @@ export function AuthGate({ onAuthenticated }: { onAuthenticated: () => void }) {
           </button>
         </div>
 
-        {error && <div className="phx-alert error">{error}</div>}
+        {error && (
+          <div className="phx-alert error">
+            <div>{error}</div>
+            {runtime.mode === "firebase_cloud" && (
+              <button
+                type="button"
+                className="inline-link"
+                style={{ marginTop: 6, display: "inline-block" }}
+                onClick={() => {
+                  setLocalVaultForced(true)
+                  resetFirebaseRuntimeCache()
+                  window.location.reload()
+                }}
+              >
+                Use Instant Device Vault on this phone while Cloud Auth activates →
+              </button>
+            )}
+          </div>
+        )}
+        {isLocalVaultForced() && (
+          <div className="phx-alert success">
+            Running in Instant Device Vault mode.{" "}
+            <button
+              type="button"
+              className="inline-link"
+              onClick={() => {
+                setLocalVaultForced(false)
+                resetFirebaseRuntimeCache()
+                window.location.reload()
+              }}
+            >
+              Switch back to Firebase Cloud (phenaxis-ug) →
+            </button>
+          </div>
+        )}
         {info && <div className="phx-alert success">{info}</div>}
 
         {tab === "cloud" ? (

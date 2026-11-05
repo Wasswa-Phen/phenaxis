@@ -8,6 +8,18 @@ import {
 } from "firebase/firestore"
 
 const FIREBASE_CONFIG_STORAGE_KEY = "phenaxis:firebase_web_config_v1"
+const FORCE_VAULT_FALLBACK_KEY = "phenaxis:force_local_vault_v1"
+
+export function isLocalVaultForced(): boolean {
+  if (typeof window === "undefined" || !window.localStorage) return false
+  return window.localStorage.getItem(FORCE_VAULT_FALLBACK_KEY) === "1"
+}
+
+export function setLocalVaultForced(forced: boolean): void {
+  if (typeof window === "undefined" || !window.localStorage) return
+  if (forced) window.localStorage.setItem(FORCE_VAULT_FALLBACK_KEY, "1")
+  else window.localStorage.removeItem(FORCE_VAULT_FALLBACK_KEY)
+}
 
 export interface FirebaseRuntimeState {
   mode: "firebase_cloud" | "local_isolated_vault"
@@ -80,6 +92,18 @@ let cachedState: FirebaseRuntimeState | null = null
 
 export function getFirebaseRuntime(): FirebaseRuntimeState {
   if (cachedState) return cachedState
+
+  if (isLocalVaultForced()) {
+    cachedState = {
+      mode: "local_isolated_vault",
+      app: null,
+      auth: null,
+      db: null,
+      projectId: null,
+      configSource: "none",
+    }
+    return cachedState
+  }
 
   const envCfg = readEnvConfig()
   const uiCfg = envCfg ? null : readSavedUiFirebaseConfig()

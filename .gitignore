@@ -4,6 +4,7 @@ build/
 .cache/
 .env*
 !.env.example
+!.env.production
 .firebase/
 .vite/
 vite.config.*.timestamp-*
