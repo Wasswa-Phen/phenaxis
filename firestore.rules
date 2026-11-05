@@ -3,6 +3,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // Helper functions
     function isAuthenticated() {
       return request.auth != null;
     }
@@ -11,117 +12,42 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == uid;
     }
 
-    function hasValidOwnerTag(uid) {
-      return !('ownerUid' in request.resource.data) || request.resource.data.ownerUid == uid;
-    }
-
-    function isValidTimestampString(field) {
-      return !(field in request.resource.data) || request.resource.data[field] is string;
-    }
-
-    // User profile document and subcollections
+    // 1. Strict Per-User Root & All Subcollections
+    // Automatically allows the authenticated user full read/write access
+    // to their user profile and all nested subcollections (accounts, transactions,
+    // tasks, projects, categories, budgets, settings, etc.)
     match /users/{uid} {
-      allow read: if isOwner(uid);
-      allow create, update: if isOwner(uid) && hasValidOwnerTag(uid);
-      allow delete: if false;
+      allow read, write: if isOwner(uid);
 
-      // 1. Accounts
-      match /accounts/{accountId} {
-        allow read: if isOwner(uid);
-        allow create, update: if isOwner(uid)
-          && hasValidOwnerTag(uid)
-          && (!('name' in request.resource.data) || (request.resource.data.name is string && request.resource.data.name.size() > 0));
-        allow delete: if isOwner(uid);
+      match /{allSubcollections=**} {
+        allow read, write: if isOwner(uid);
       }
+    }
 
-      // 2. Transactions
-      match /transactions/{transactionId} {
-        allow read: if isOwner(uid);
-        allow create: if isOwner(uid)
-          && hasValidOwnerTag(uid)
-          && (!('amount' in request.resource.data) || request.resource.data.amount is number);
-        allow update: if isOwner(uid)
-          && hasValidOwnerTag(uid)
-          && (!('amount' in request.resource.data) || request.resource.data.amount is number);
-        allow delete: if false;
-      }
+    // 2. Root-level Collection Fallbacks
+    // If your client queries collections at the root level tagged by user UID:
+    match /ledgers/{ledgerId} {
+      allow read, write: if isAuthenticated() && (
+        resource == null || 
+        resource.data.userId == request.auth.uid || 
+        resource.data.ownerUid == request.auth.uid
+      );
+    }
 
-      // 3. Income Sources
-      match /income_sources/{sourceId} {
-        allow read: if isOwner(uid);
-        allow create, update: if isOwner(uid) && hasValidOwnerTag(uid);
-        allow delete: if isOwner(uid);
-      }
+    match /accounts/{accountId} {
+      allow read, write: if isAuthenticated() && (
+        resource == null || 
+        resource.data.userId == request.auth.uid || 
+        resource.data.ownerUid == request.auth.uid
+      );
+    }
 
-      // 4. Categories
-      match /categories/{categoryId} {
-        allow read: if isOwner(uid);
-        allow create, update: if isOwner(uid) && hasValidOwnerTag(uid);
-        allow delete: if isOwner(uid);
-      }
-
-      // 5. Allocations
-      match /allocations/{allocationId} {
-        allow read: if isOwner(uid);
-        allow create, update: if isOwner(uid) && hasValidOwnerTag(uid);
-        allow delete: if false;
-      }
-
-      // 6. Budgets
-      match /budgets/{budgetId} {
-        allow read: if isOwner(uid);
-        allow create, update: if isOwner(uid) && hasValidOwnerTag(uid);
-        allow delete: if isOwner(uid);
-      }
-
-      // 7. Entrusted Funds
-      match /entrusted_funds/{fundId} {
-        allow read: if isOwner(uid);
-        allow create, update: if isOwner(uid) && hasValidOwnerTag(uid);
-        allow delete: if isOwner(uid);
-      }
-
-      // 8. Savings Goals
-      match /savings_goals/{goalId} {
-        allow read: if isOwner(uid);
-        allow create, update: if isOwner(uid) && hasValidOwnerTag(uid);
-        allow delete: if isOwner(uid);
-      }
-
-      // 9. Recurring Expenses
-      match /recurring_expenses/{recurringId} {
-        allow read: if isOwner(uid);
-        allow create, update: if isOwner(uid) && hasValidOwnerTag(uid);
-        allow delete: if isOwner(uid);
-      }
-
-      // 10. Tasks
-      match /tasks/{taskId} {
-        allow read, write: if isOwner(uid) && hasValidOwnerTag(uid);
-      }
-
-      // 11. Projects
-      match /projects/{projectId} {
-        allow read, write: if isOwner(uid) && hasValidOwnerTag(uid);
-      }
-
-      // 12. Calendar Events
-      match /calendar_events/{eventId} {
-        allow read, write: if isOwner(uid) && hasValidOwnerTag(uid);
-      }
-
-      // 13. Financial Reports
-      match /financial_reports/{reportId} {
-        allow read, create, update: if isOwner(uid) && hasValidOwnerTag(uid);
-        allow delete: if isOwner(uid);
-      }
-
-      // 14. Settings
-      match /settings/{settingId} {
-        allow read: if isOwner(uid);
-        allow create, update: if isOwner(uid) && hasValidOwnerTag(uid);
-        allow delete: if false;
-      }
+    match /transactions/{transactionId} {
+      allow read, write: if isAuthenticated() && (
+        resource == null || 
+        resource.data.userId == request.auth.uid || 
+        resource.data.ownerUid == request.auth.uid
+      );
     }
   }
 }
